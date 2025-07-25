@@ -15,10 +15,6 @@ main() {
     install_npm
     install_claude
 
-    uv run claude config list
-    uv run claude config set hasTrustDialogAccepted true
-    # uv run claude config set hasCompletedProjectOnboarding true
-    uv run claude config list
 
     run_claude
 
@@ -89,6 +85,11 @@ run_claude() {
               | .bypassPermissionsModeAccepted = true
               | .hasTrustDialogAccepted        = true
             ' ~/.claude.json |sponge ~/.claude.json
+
+            uv run claude config list
+            uv run claude config set hasTrustDialogAccepted true
+            # uv run claude config set hasCompletedProjectOnboarding true
+            uv run claude config list
 
             uv run claude --dangerously-skip-permissions --print /terminal-setup
         fi
