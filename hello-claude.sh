@@ -86,12 +86,12 @@ run_claude() {
               | .hasTrustDialogAccepted        = true
             ' ~/.claude.json |sponge ~/.claude.json
 
+            uv run claude --dangerously-skip-permissions --print /terminal-setup
+
             uv run claude config list
             uv run claude config set hasTrustDialogAccepted true
             # uv run claude config set hasCompletedProjectOnboarding true
             uv run claude config list
-
-            uv run claude --dangerously-skip-permissions --print /terminal-setup
         fi
 
         # this will pause here wating for prompts
