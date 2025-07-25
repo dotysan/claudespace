@@ -15,30 +15,13 @@ main() {
     install_npm
     install_claude
 
-    if [[ "${CODESPACES:-}" == true && "${TERM_PROGRAM:-}" == vscode ]]
-    then
-
-        # trigger the creation of ~/.claude.json
-        uv run claude config list --global
-
-        # then bypass some prompts
-        jq '.hasCompletedOnboarding        = true
-          | .bypassPermissionsModeAccepted = true
-          | .hasTrustDialogAccepted        = true
-        ' ~/.claude.json |sponge ~/.claude.json
-
-        # this will pause here wating for prompts
-        uv run claude --dangerously-skip-permissions /terminal-setup
-
-    else # DANGER! Never --dangerously-skip-permissions on a host
-    # then tmux new-session -s claude 'uv run claude --dangerously-skip-permissions'
-        uv run claude
-    fi
+#    run_claude
 
     # uv run claude-flow init
     # uv run claude-flow --help
     # echo 'Ready to swarm!'
 }
+
 
 chk_deps() {
 
@@ -83,6 +66,36 @@ install_claude() {
 
     if [[ ! -x .venv/bin/claude-flow ]]
     then uv run npm install --global claude-flow@alpha
+    fi
+}
+
+run_claude() {
+    if [[ "${CODESPACES:-}" == true && "${TERM_PROGRAM:-}" == vscode ]]
+    then
+
+        if [[ ! -e ~/.claude.json ]]
+        then
+            # trigger the creation of ~/.claude.json
+            uv run claude config list --global
+
+            # then bypass some prompts
+            jq '.hasCompletedOnboarding        = true
+              | .bypassPermissionsModeAccepted = true
+              | .hasTrustDialogAccepted        = true
+            ' ~/.claude.json |sponge ~/.claude.json
+
+            uv run claude --dangerously-skip-permissions --print /terminal-setup
+        fi
+
+        # this will pause here wating for prompts
+        if [[ $(jq --raw-output .primaryApiKey ~/.claude.json) == null ]]
+        then uv run claude --dangerously-skip-permissions --ide /login
+        else uv run claude --dangerously-skip-permissions --ide
+        fi
+
+    else # DANGER! Never --dangerously-skip-permissions on a host
+    # then tmux new-session -s claude 'uv run claude --dangerously-skip-permissions'
+        uv run claude
     fi
 }
 
