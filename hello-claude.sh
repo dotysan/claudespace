@@ -95,8 +95,8 @@ run_claude() {
 
         # this will pause here wating for prompts
         if [[ $(jq --raw-output .primaryApiKey ~/.claude.json) == null ]]
-        then uv run claude --dangerously-skip-permissions --ide /login
-        else uv run claude --dangerously-skip-permissions --ide
+        then echo uv run claude --dangerously-skip-permissions --ide /login
+        else echo uv run claude --dangerously-skip-permissions --ide
         fi
 
     else # DANGER! Never --dangerously-skip-permissions on a host
