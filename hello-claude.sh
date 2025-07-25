@@ -15,7 +15,12 @@ main() {
     install_npm
     install_claude
 
-#    run_claude
+    uv run claude config list
+    uv run claude config set hasTrustDialogAccepted true
+    # uv run claude config set hasCompletedProjectOnboarding true
+    uv run claude config list
+
+    run_claude
 
     # uv run claude-flow init
     # uv run claude-flow --help
@@ -54,6 +59,7 @@ install_npm() {
     if [[ ! -x .venv/bin/npm ]]
     then
         uv run nodeenv --python-virtualenv --node=lts
+        echo 'fund=false' >>~/.npmrc
         uv run npm install --global npm
     fi
 }
