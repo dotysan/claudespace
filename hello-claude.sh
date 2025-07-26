@@ -15,12 +15,17 @@ main() {
     install_npm
     install_claude
 
-
     run_claude
 
-    # uv run claude-flow init
-    # uv run claude-flow --help
-    # echo 'Ready to swarm!'
+    if [[ ! -e CLAUDE.md ]]
+    then
+        uv run claude-flow init
+        git add .gitignore .claude .roo* CLAUDE.md memory
+        git commit -m 'claude-flow init'
+    fi
+
+    uv run claude-flow --help
+    echo 'Ready to swarm!'
 }
 
 
@@ -72,6 +77,14 @@ install_claude() {
 }
 
 run_claude() {
+
+    # skip running claude twice
+    if pgrep --full '^uv run claude' >/dev/null
+    then
+        echo "Claude Code is already running."
+        return
+    fi
+
     if [[ "${CODESPACES:-}" == true && "${TERM_PROGRAM:-}" == vscode ]]
     then
 
@@ -86,21 +99,20 @@ run_claude() {
               | .hasTrustDialogAccepted        = true
             ' ~/.claude.json |sponge ~/.claude.json
 
-            uv run claude --dangerously-skip-permissions --print /terminal-setup
-
-            uv run claude config list
+            # ensures that claude-code will run the MCP servers
             uv run claude config set hasTrustDialogAccepted true
+
+            # is this next one needed for anything?
             # uv run claude config set hasCompletedProjectOnboarding true
-            uv run claude config list
         fi
 
         # this will pause here wating for prompts
         if [[ $(jq --raw-output .primaryApiKey ~/.claude.json) == null ]]
-        then echo uv run claude --dangerously-skip-permissions --ide /login
-        else echo uv run claude --dangerously-skip-permissions --ide
+        then uv run claude --dangerously-skip-permissions --ide /login
+        else uv run claude --dangerously-skip-permissions
         fi
 
-    else # DANGER! Never --dangerously-skip-permissions on a host
+    else # DANGER! Never --dangerously-skip-permissions on a non-containerized host
     # then tmux new-session -s claude 'uv run claude --dangerously-skip-permissions'
         uv run claude
     fi
