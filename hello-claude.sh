@@ -17,12 +17,13 @@ main() {
 
     run_claude
 
-    if [[ ! -e CLAUDE.md ]]
-    then
-        uv run claude-flow init
-        git add .gitignore .claude .roo* CLAUDE.md memory
-        git commit -m 'claude-flow init'
-    fi
+    # if [[ ! -e CLAUDE.md ]]
+    # then
+    #     uv run claude-flow init
+    #     git add .gitignore .claude .roo* CLAUDE.md memory
+    #     git commit -m 'claude-flow init'
+    # fi
+    # above is brittle; moved to README.md
 
     uv run claude-flow --help
     echo 'Ready to swarm!'
